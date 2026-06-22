@@ -1,0 +1,158 @@
+create database university;
+use university;
+
+
+create table Students (
+StudentID int primary key auto_increment,
+FirstName varchar(50),
+LastName varchar(50),
+Email varchar(100),
+BirthDate date,
+EnrollmentDate date);
+
+
+
+create table Departments (
+DepartmentID int primary key auto_increment,
+DepartmentName varchar(100));
+
+
+
+create table Courses (
+CourseID int primary key auto_increment,
+CourseName varchar(100),
+DepartmentID int,
+Credits int,
+foreign key (DepartmentID) references Departments(DepartmentID));
+
+
+
+create table Instructors (
+InstructorID int primary key auto_increment,
+FirstName varchar(50),
+LastName varchar(50),
+Email varchar(100),
+DepartmentID int,
+foreign key (DepartmentID) references Departments(DepartmentID));
+
+
+
+create table Enrollments (
+EnrollmentID int primary key auto_increment,
+StudentID int,
+CourseID int,
+EnrollmentDate date,
+foreign key (StudentID) references Students(StudentID),
+foreign key (CourseID) references Courses(CourseID));
+
+
+
+
+insert into Students (FirstName, LastName, Email, BirthDate, EnrollmentDate) values
+('John','Doe','john@email.com','2000-01-15','2022-08-01'),
+('Jane','Smith','jane@email.com','1999-05-25','2021-08-01');
+
+
+
+insert into Departments (DepartmentName)
+values ('Computer Science'), ('Mathematics');
+
+
+
+insert into Courses (CourseName, DepartmentID, Credits) values
+('Introduction to SQL',1,3),
+('Data Structures',2,4);
+
+
+
+insert into Instructors (FirstName, LastName, Email, DepartmentID) values
+('Alice','Johnson','alice@univ.com',1),
+('Bob','Lee','bob@univ.com',2);
+
+
+
+insert into Enrollments (StudentID, CourseID, EnrollmentDate) values
+(1,1,'2022-08-01'),
+(2,2,'2021-08-01');
+
+
+
+-- query 1
+
+update Students
+set Email = 'john123@email.com'
+where StudentID = 1;
+
+
+delete from Students
+where StudentID = 2;
+
+
+select * from Students;
+
+
+-- query 2
+
+select * from Students where EnrollmentDate > '2022-01-01';
+
+
+-- query 3
+
+select * from Courses where DepartmentID = 2 limit 5;
+
+
+-- query 4
+
+select CourseID, count(StudentID) as TotalStudents
+from Enrollments
+group by CourseID;
+
+
+-- query 5
+
+select StudentID
+from Enrollments
+where CourseID in (1,2)
+group by StudentID
+having count(distinct CourseID) = 2;
+
+
+-- query 7
+
+select avg(Credits) as AverageCredits from Courses;
+
+
+
+-- query 10
+
+select s.FirstName, c.CourseName
+from Students s
+inner join Enrollments e on s.StudentID = e.StudentID
+inner join Courses c on e.CourseID = c.CourseID;
+
+
+-- query 11
+
+select s.FirstName, c.CourseName
+from Students s
+left join Enrollments e on s.StudentID = e.StudentID
+left join Courses c on e.CourseID = c.CourseID;
+
+
+-- query 13
+
+select FirstName, year(EnrollmentDate) as EnrollmentYear from Students;
+
+
+-- query 14
+
+select concat(FirstName, ' ', LastName) as FullName from Instructors;
+
+
+-- query 16
+
+select FirstName,
+case
+when year(curdate()) - year(EnrollmentDate) > 4 then 'Senior'
+else 'Junior'
+end as StudentLevel from Students;

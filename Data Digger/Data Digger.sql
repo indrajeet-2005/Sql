@@ -1,0 +1,134 @@
+create database daataa_digger;
+
+use daataa_digger;
+
+
+
+-- TABLE 1
+
+create table customer_tables(
+	Customer_ID int(100) Primary key Auto_Increment,
+	Name varchar(50),
+	Email VARCHAR(255),
+	Address varchar(500));
+
+
+INSERT INTO customer_tables (Customer_ID, Name, Email, Address) VALUES
+(1, 'Alice Kumar', 'ravi@gmail.com', 'Chennai, Tamil Nadu'),
+(2, 'Anita Sharma', 'anita@gmail.com', 'Delhi, India'),
+(3, 'Rahul Verma', 'rahul@gmail.com', 'Mumbai, Maharashtra'),
+(4, 'Alice Patel', 'sneha@gmail.com', 'Ahmedabad, Gujarat'),
+(5, 'Arjun Singh', 'arjun@gmail.com', 'Jaipur, Rajasthan');
+
+select * from customer_tables;
+
+update customer_tables 
+set Address = 'Udaipur, Rajasthan'
+where Customer_ID = 3;
+
+delete from customer_tables where Customer_ID = 4;
+
+SELECT Name FROM customer_tables WHERE Name LIKE 'Alice%';
+
+
+
+
+-- TABLE 2
+create table order_table(
+	Order_ID int(50) primary key Auto_Increment,
+	Customer_ID int(100),
+	Order_Date varchar(15),
+	Total_Amount float(10),
+foreign key(Customer_ID) references customer_tables(Customer_ID));
+
+INSERT INTO order_table (Order_ID, Customer_ID, Order_Date, Total_Amount) VALUES
+(101, 1, '2025-01-01', 2500.50),
+(102, 2, '2025-01-02', 1500.00),
+(103, 3, '2025-01-03', 3200.75),
+(104, 4, '2025-01-04', 800.00),
+(105, 5, '2026-01-20', 4500.25);
+
+select * from order_table;
+
+update order_table 
+set Total_Amount = 10000
+where Order_ID = 101;
+
+delete from order_table where Order_ID = 104;
+
+
+select * from order_table where Order_Date >= current_date - interval 30 day;
+
+select
+	max(Total_Amount),
+    min(Total_Amount),
+    avg(Total_Amount)from order_table;
+    
+    
+
+-- TABLE 3
+create table product_table(
+Product_ID int(50) primary key,
+Product_Name varchar(50),
+Price float(15),
+Stock int(10));
+
+INSERT INTO product_table (Product_ID, Product_Name, Price, Stock) VALUES
+(201, 'Laptop', 55000.00, 10),
+(202, 'Mouse', 500.00, 100),
+(203, 'Keyboard', 1200.00, 50),
+(204, 'Monitor', 8000.00, 20),
+(205, 'Printer', 15000.00, 0);
+
+select * from product_table;
+
+
+update product_table 
+set Price = 500
+where Product_ID = 204;
+
+select * from product_table where Stock = 0;
+delete from product_table where Product_ID = 205;
+
+SELECT * FROM product_table WHERE Price >= 500 AND Price <= 2000;
+
+
+SELECT MAX(Price) AS Expensive, MIN(Price) AS Cheapest FROM product_table;
+
+
+
+
+-- TABLE 4
+
+create table order_detail_table (
+    Order_detail_ID int(50) primary key,
+    Order_ID int(50),
+    Product_ID int(50),
+    Quantity int(10),
+    Sub_Total int(100),
+
+    foreign key (Order_ID) references order_table(Order_ID),
+    foreign key (Product_ID) references product_table(Product_ID)
+);
+
+
+
+
+INSERT INTO order_detail_table (Order_detail_ID, Order_ID, Product_ID, Quantity, Sub_Total) VALUES
+(301, 101, 202, 2, 1000),
+(302, 102, 203, 1, 1200),
+(303, 103, 201, 1, 55000),
+(304, 104, 202, 1, 500),
+(305, 105, 204, 2, 16000);
+
+select * from order_detail_table;
+
+select sum(Sub_Total) as total_revenue from order_detail_table;
+
+select * from order_detail_table order by Quantity desc limit 3;
+
+select Product_ID, count(*) as total_times_sold from order_detail_table where Product_ID = 302 group by Product_ID;
+
+
+
+
